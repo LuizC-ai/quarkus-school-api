@@ -48,4 +48,8 @@ public class AlunoService {
         Aluno aluno = findById(id);
         alunoRepository.delete(aluno);
     }
+
+    public List<Aluno> findAll( ) {
+        return alunoRepository.listAll();
+    }
 }

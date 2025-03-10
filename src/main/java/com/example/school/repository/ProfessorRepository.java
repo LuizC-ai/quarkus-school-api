@@ -22,5 +22,4 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ProfessorRepository implements PanacheRepository<Professor> {
     // Os métodos básicos são herdados do PanacheRepository
-    // listAll(), findById(), persist(), delete(), etc.
 }

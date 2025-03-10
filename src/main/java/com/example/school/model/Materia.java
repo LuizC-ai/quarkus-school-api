@@ -35,7 +35,7 @@ public class Materia {
 
     private String nome;
     private Integer quantidadeHoras;
-//ANALISAR MUITOS P MUITOS
+
     @ManyToOne
     @JoinColumn(name = "professor_id")
     private Professor professor;
@@ -50,4 +50,3 @@ public class Materia {
     private List<Aluno> alunos = new ArrayList<>();
 }
 
-//classe materia aluno que seria manytoOne aluno e ManytoOne aluno

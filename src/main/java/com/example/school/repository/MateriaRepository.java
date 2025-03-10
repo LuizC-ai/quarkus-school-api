@@ -6,5 +6,4 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class MateriaRepository implements PanacheRepository<Materia> {
-    // Métodos específicos podem ser adicionados aqui
 }

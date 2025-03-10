@@ -22,6 +22,7 @@ public class AlunoController {
 
     @GET
     public List<Aluno> getAll() {
+
         return alunoService.findAll();
     }
 

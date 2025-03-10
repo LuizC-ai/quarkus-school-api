@@ -6,5 +6,4 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class AlunoRepository implements PanacheRepository<Aluno> {
-    // Métodos específicos podem ser adicionados aqui
 }
