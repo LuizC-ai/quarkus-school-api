@@ -2,12 +2,10 @@ package com.example.school.resource;
 
 import java.util.List;
 
-import com.example.school.model.Materia;
 import com.example.school.model.Professor;
-import com.example.school.repository.ProfessorRepository;
+import com.example.school.service.ProfessorService;
 
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -19,57 +17,45 @@ import jakarta.ws.rs.core.Response.Status;
 public class ProfessorResource {
 
     @Inject
-    ProfessorRepository professorRepository;
+    ProfessorService professorService;
 
     @GET
     public List<Professor> getAll() {
-        return professorRepository.listAll();
+        return professorService.listAll();
     }
 
     @GET
     @Path("/{id}")
     public Response getById(@PathParam("id") Long id) {
-        return professorRepository.findByIdOptional(id)
-                .map(professor -> Response.ok(professor).build())
-                .orElse(Response.status(Status.NOT_FOUND).build());
+        Professor professor = professorService.findById(id);
+        return Response.ok(professor).build();
     }
 
     @POST
-    @Transactional
     public Response create(Professor professor) {
-        professorRepository.persist(professor);
-        return Response.status(Status.CREATED).entity(professor).build();
+        Professor created = professorService.create(professor);
+        return Response.status(Status.CREATED).entity(created).build();
     }
 
     @PUT
     @Path("/{id}")
-    @Transactional
     public Response update(@PathParam("id") Long id, Professor professor) {
-        Professor entity = professorRepository.findById(id);
-        if (entity == null) {
-            return Response.status(Status.NOT_FOUND).build();
-        }
-        
-        entity.setNome(professor.getNome());
-        entity.setSobrenome(professor.getSobrenome());
-        entity.setIdade(professor.getIdade());
-        
-        return Response.ok(entity).build();
+        Professor updated = professorService.update(id, professor);
+        return Response.ok(updated).build();
     }
 
     @DELETE
     @Path("/{id}")
-    @Transactional
     public Response delete(@PathParam("id") Long id) {
-        boolean deleted = professorRepository.deleteById(id);
-        return deleted ? Response.noContent().build() : Response.status(Status.NOT_FOUND).build();
+        professorService.delete(id);
+        return Response.noContent().build();
     }
     
     @GET
     @Path("/{id}/materias")
     public Response getMateriasByProfessor(@PathParam("id") Long id) {
-        return professorRepository.findByIdOptional(id)
-                .map(professor -> Response.ok(professor.getMaterias()).build())
-                .orElse(Response.status(Status.NOT_FOUND).build());
+        Professor professor = professorService.findById(id);
+        return Response.ok(professor.getMaterias()).build();
     }
 }
+

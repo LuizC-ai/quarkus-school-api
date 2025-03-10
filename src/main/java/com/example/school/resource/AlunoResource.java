@@ -118,3 +118,5 @@ public class AlunoResource {
         return Response.ok(aluno).build();
     }
 }
+//CRIAR O SERVICE E PASSAR RESPONSABILIDADE PARA ELE
+// MANTER RETORNO DEPOIS CRIAR O HANDLER DE EXCESSAO

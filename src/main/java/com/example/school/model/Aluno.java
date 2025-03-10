@@ -35,7 +35,7 @@ public class Aluno {
     private Integer idade;
     private String turma;
 
-    @ManyToMany(mappedBy = "alunos")
+    @ManyToMany(mappedBy = "alunos", fetch = jakarta.persistence.FetchType.LAZY)
     @Builder.Default
     private List<Materia> materias = new ArrayList<>();
 }

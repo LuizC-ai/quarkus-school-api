@@ -17,6 +17,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,5 +46,6 @@ public class Professor {
      */
     @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
     @Builder.Default
+    @JsonManagedReference
     private List<Materia> materias = new ArrayList<>();
 }
