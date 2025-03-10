@@ -1,51 +1,51 @@
 package com.example.school.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
-@ToString
-@Builder
-@Table(name = "professores")
 public class Professor {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String nome;
-    private String sobrenome;
-    private Integer idade;
-
-    /*
-     * Está associação estará mapeada na classe Materia, 
-     * onde esta o atributo professor.
-     * 
-     * O builder.Default é uma anotação do lombok que cria uma lista vazia
-     * para evitar que a lista seja nula. Isto ajuda a evitar NullPointerException.
-     */
-    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
-    @Builder.Default
-    @JsonManagedReference
-    private List<Materia> materias = new ArrayList<>();
+    
+    private String name;
+    // Other fields
+    
+    // Replace @OneToMany with @ManyToMany or use join table explicitly
+    // PostgreSQL prefers using join tables for collections rather than direct list mappings
+    @ManyToMany
+    @JoinTable(
+        name = "professor_materia", 
+        joinColumns = @JoinColumn(name = "professor_id"),
+        inverseJoinColumns = @JoinColumn(name = "materia_id")
+    )
+    private Set<Materia> materias = new HashSet<>();
+    
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public Set<Materia> getMaterias() {
+        return materias;
+    }
+    
+    public void setMaterias(Set<Materia> materias) {
+        this.materias = materias;
+    }
 }

@@ -1,4 +1,4 @@
-package com.github.luizkowalski.util;
+package com.example.school.util;
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import io.quarkus.panache.common.Page;

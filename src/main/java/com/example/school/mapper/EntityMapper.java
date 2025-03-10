@@ -1,14 +1,13 @@
-package com.github.luizkowalski.mapper;
+package com.example.school.mapper;
 
-import com.github.luizkowalski.domain.Aluno;
-import com.github.luizkowalski.domain.AlunoMateria;
-import com.github.luizkowalski.domain.Materia;
-import com.github.luizkowalski.domain.Professor;
-import com.github.luizkowalski.dto.AlunoDTO;
-import com.github.luizkowalski.dto.MateriaDTO;
-import com.github.luizkowalski.dto.ProfessorDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+
+import com.example.school.dto.AlunoDTO;
+import com.example.school.dto.MateriaDTO;
+import com.example.school.dto.ProfessorDTO;
+import com.example.school.model.Aluno;
+import com.example.school.model.AlunoMateria;
+import com.example.school.model.Materia;
+import com.example.school.model.Professor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,21 +16,21 @@ import java.util.stream.Collectors;
 public interface EntityMapper {
 
     // Professor mappings
-    ProfessorDTO toProfessorDTO(Professor professor);
+    ProfessorDTO toProfessorDTO( Professor professor);
     Professor toProfessorEntity(ProfessorDTO dto);
     List<ProfessorDTO> toProfessorDTOList(List<Professor> professors);
 
     // Materia mappings
-    MateriaDTO toMateriaDTO(Materia materia);
+    MateriaDTO toMateriaDTO( Materia materia);
     Materia toMateriaEntity(MateriaDTO dto);
     List<MateriaDTO> toMateriaDTOList(List<Materia> materias);
 
     // Aluno mappings
     @Mapping(target = "materias", ignore = true)
-    AlunoDTO toAlunoDTO(Aluno aluno);
+    AlunoDTO toAlunoDTO( Aluno aluno);
     
     @Mapping(target = "materias", ignore = true)
-    Aluno toAlunoEntity(AlunoDTO dto);
+    Aluno toAlunoEntity( AlunoDTO dto);
     
     List<AlunoDTO> toAlunoDTOList(List<Aluno> alunos);
     
