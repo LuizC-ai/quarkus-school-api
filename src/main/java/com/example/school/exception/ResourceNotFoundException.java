@@ -1,8 +1,11 @@
 package com.example.school.exception;
 
-public class ResourceNotFoundException extends RuntimeException {
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
 
+public class ResourceNotFoundException extends WebApplicationException {
+    
     public ResourceNotFoundException(String message) {
-        super(message);
+        super(message, Response.Status.NOT_FOUND);
     }
 }

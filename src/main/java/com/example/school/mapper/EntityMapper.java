@@ -1,5 +1,8 @@
 package com.example.school.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
@@ -16,23 +19,33 @@ import java.util.stream.Collectors;
 public interface EntityMapper {
 
     // Professor mappings
-    ProfessorDTO toProfessorDTO( Professor professor);
+    ProfessorDTO toProfessorDTO(Professor professor);
     Professor toProfessorEntity(ProfessorDTO dto);
     List<ProfessorDTO> toProfessorDTOList(List<Professor> professors);
+    
+    // Adicionar método para atualizar entidade existente
+    void updateProfessorFromDto(ProfessorDTO dto, @MappingTarget Professor professor);
 
     // Materia mappings
-    MateriaDTO toMateriaDTO( Materia materia);
+    MateriaDTO toMateriaDTO(Materia materia);
     Materia toMateriaEntity(MateriaDTO dto);
     List<MateriaDTO> toMateriaDTOList(List<Materia> materias);
+    
+    // Adicionar método para atualizar entidade existente
+    void updateMateriaFromDto(MateriaDTO dto, @MappingTarget Materia materia);
 
     // Aluno mappings
     @Mapping(target = "materias", ignore = true)
-    AlunoDTO toAlunoDTO( Aluno aluno);
+    AlunoDTO toAlunoDTO(Aluno aluno);
     
     @Mapping(target = "materias", ignore = true)
-    Aluno toAlunoEntity( AlunoDTO dto);
+    Aluno toAlunoEntity(AlunoDTO dto);
     
     List<AlunoDTO> toAlunoDTOList(List<Aluno> alunos);
+    
+    // Adicionar método para atualizar entidade existente
+    @Mapping(target = "materias", ignore = true)
+    void updateAlunoFromDto(AlunoDTO dto, @MappingTarget Aluno aluno);
     
     default AlunoDTO toAlunoDTOWithMaterias(Aluno aluno, List<AlunoMateria> alunoMaterias) {
         AlunoDTO dto = toAlunoDTO(aluno);

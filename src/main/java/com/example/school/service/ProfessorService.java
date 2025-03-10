@@ -1,14 +1,17 @@
 package com.example.school.service;
 
+import com.example.school.dto.ProfessorDTO;
+import com.example.school.exception.ResourceNotFoundException;
+import com.example.school.mapper.EntityMapper;
 import com.example.school.model.Professor;
 import com.example.school.repository.ProfessorRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 
 @ApplicationScoped
 public class ProfessorService {
@@ -16,39 +19,58 @@ public class ProfessorService {
     @Inject
     ProfessorRepository professorRepository;
     
-    public List<Professor> listAll() {
-        return professorRepository.listAll();
+    @Inject
+    EntityMapper entityMapper;
+    
+    public List<ProfessorDTO> findAll() {
+        return entityMapper.toProfessorDTOList(professorRepository.listAll());
     }
     
-    public Professor findById(Long id) {
-        return professorRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Professor não encontrado com id: " + id));
+    public ProfessorDTO findById(Long id) {
+        Professor professor = findEntityById(id);
+        return entityMapper.toProfessorDTO(professor);
     }
     
     @Transactional
-    public Professor create(Professor professor) {
+    public ProfessorDTO create(ProfessorDTO professorDTO) {
+        Objects.requireNonNull(professorDTO, "Professor não pode ser nulo");
+        
+        if (professorDTO.getId() != null) {
+            professorDTO.setId(null); // Forçar criação de novo registro
+        }
+        
+        Professor professor = entityMapper.toProfessorEntity(professorDTO);
         professorRepository.persist(professor);
-        return professor;
+        return entityMapper.toProfessorDTO(professor);
     }
     
     @Transactional
-    public Professor update(Long id, Professor professor) {
-        Professor entity = findById(id);
+    public ProfessorDTO update(Long id, ProfessorDTO professorDTO) {
+        Objects.requireNonNull(professorDTO, "Professor não pode ser nulo");
+        Objects.requireNonNull(id, "ID não pode ser nulo");
         
-        if (professor.getNome() != null) entity.setNome(professor.getNome());
-        if (professor.getSobrenome() != null) entity.setSobrenome(professor.getSobrenome());
-        if (professor.getIdade() != null) entity.setIdade(professor.getIdade());
+        Professor entity = findEntityById(id);
+        entityMapper.updateProfessorFromDto(professorDTO, entity);
         
-        return entity;
+        return entityMapper.toProfessorDTO(entity);
     }
     
     @Transactional
     public void delete(Long id) {
-        Professor professor = findById(id);
+        Professor professor = findEntityById(id);
         professorRepository.delete(professor);
     }
     
-    public List<Professor> findByNome(String nome) {
-        return professorRepository.list("nome", nome);
+    public List<ProfessorDTO> findByNome(String nome) {
+        Objects.requireNonNull(nome, "Nome não pode ser nulo");
+        return entityMapper.toProfessorDTOList(professorRepository.list("nome", nome));
+    }
+    
+    /**
+     * Método auxiliar para recuperar entidade por ID ou lançar exceção
+     */
+    private Professor findEntityById(Long id) {
+        return professorRepository.findByIdOptional(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com id: " + id));
     }
 }

@@ -1,41 +1,28 @@
 package com.example.school.exception;
 
-import java.time.LocalDateTime;
+import jakarta.ws.rs.core.Response.Status;
 
 public class ErrorResponse {
-    private LocalDateTime timestamp;
+    private String code;
+    private String message;
     private int status;
     private String error;
-    private String message;
     private String path;
 
     public ErrorResponse() {
-        this.timestamp = LocalDateTime.now();
     }
 
-    // Getters e Setters
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public ErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public String getCode() {
+        return code;
     }
 
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getMessage() {
@@ -46,11 +33,27 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public String getPath() {
-        return path;
+    public void setStatus(int statusCode) {
+        this.status = statusCode;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getError() {
+        return error;
     }
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getPath() {
+        return path;
     }
 }

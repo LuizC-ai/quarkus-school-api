@@ -1,81 +1,90 @@
 package com.example.school.service;
 
+import java.util.List;
+import java.util.Objects;
+
+import com.example.school.dto.MateriaDTO;
 import com.example.school.exception.ResourceNotFoundException;
+import com.example.school.mapper.EntityMapper;
 import com.example.school.model.Materia;
+import com.example.school.model.Professor;
 import com.example.school.repository.MateriaRepository;
+import com.example.school.repository.ProfessorRepository;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-
-import java.util.List;
-
-/**
- * Service responsible for handling Materia business operations
- */
 @ApplicationScoped
 public class MateriaService {
-    
-    private final MateriaRepository materiaRepository;
+
+    @Inject
+    MateriaRepository materiaRepository;
     
     @Inject
-    public MateriaService( MateriaRepository materiaRepository) {
-        this.materiaRepository = materiaRepository;
+    ProfessorRepository professorRepository;
+    
+    @Inject
+    EntityMapper entityMapper;
+    
+    public List<MateriaDTO> findAll() {
+        return entityMapper.toMateriaDTOList(materiaRepository.listAll());
     }
     
-    /**
-     * Retrieves all Materia entities
-     * @return List of all Materia entities
-     */
-    public List<Materia> findAll() {
-        return materiaRepository.listAll();
+    public MateriaDTO findById(Long id) {
+        Materia materia = findEntityById(id);
+        return entityMapper.toMateriaDTO(materia);
     }
     
-    /**
-     * Finds a Materia by its ID
-     * @param id Materia ID
-     * @return Materia entity
-     * @throws ResourceNotFoundException if Materia not found
-     */
-    public Materia findById(Long id) {
-        return materiaRepository.findByIdOptional(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Materia not found with id: " + id));
-    }
-    
-    /**
-     * Creates a new Materia
-     * @param materia Materia to be created
-     * @return Created Materia
-     */
     @Transactional
-    public Materia create(Materia materia) {
+    public MateriaDTO create(MateriaDTO materiaDTO) {
+        Objects.requireNonNull(materiaDTO, "Materia não pode ser nula");
+        
+        if (materiaDTO.getId() != null) {
+            materiaDTO.setId(null); // Forçar criação de novo registro
+        }
+        
+        Materia materia = entityMapper.toMateriaEntity(materiaDTO);
         materiaRepository.persist(materia);
-        return materia;
+        return entityMapper.toMateriaDTO(materia);
     }
     
-    /**
-     * Updates an existing Materia
-     * @param id Materia ID
-     * @param materia Updated Materia data
-     * @return Updated Materia
-     * @throws ResourceNotFoundException if Materia not found
-     */
     @Transactional
-    public Materia update(Long id, Materia materia) {
-        Materia entity = findById(id);
-        entity.setName(materia.getName());
-        // Update other properties as needed
-        return entity;
+    public MateriaDTO update(Long id, MateriaDTO materiaDTO) {
+        Objects.requireNonNull(materiaDTO, "Materia não pode ser nula");
+        Objects.requireNonNull(id, "ID não pode ser nulo");
+        
+        Materia entity = findEntityById(id);
+        entityMapper.updateMateriaFromDto(materiaDTO, entity);
+        
+        return entityMapper.toMateriaDTO(entity);
     }
     
-    /**
-     * Deletes a Materia by its ID
-     * @param id Materia ID
-     * @throws ResourceNotFoundException if Materia not found
-     */
     @Transactional
     public void delete(Long id) {
-        Materia entity = findById(id);
-        materiaRepository.delete(entity);
+        boolean deleted = materiaRepository.deleteById(id);
+        if (!deleted) {
+            throw new ResourceNotFoundException("Materia não encontrada com id: " + id);
+        }
+    }
+    
+    @Transactional
+    public MateriaDTO associarProfessor(Long materiaId, Long professorId) {
+        Materia materia = findEntityById(materiaId);
+        
+        Professor professor = professorRepository.findByIdOptional(professorId)
+            .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com id: " + professorId));
+        
+        materia.setProfessor(professor);
+        
+        return entityMapper.toMateriaDTO(materia);
+    }
+    
+    /**
+     * Método auxiliar para recuperar entidade por ID ou lançar exceção
+     */
+    private Materia findEntityById(Long id) {
+        return materiaRepository.findByIdOptional(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com id: " + id));
     }
 }

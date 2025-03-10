@@ -1,6 +1,6 @@
 package com.example.school.repository;
 
-import com.github.luizkowalski.domain.AlunoMateria;
+import com.example.school.model.AlunoMateria;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 

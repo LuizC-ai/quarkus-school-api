@@ -1,30 +1,29 @@
 package com.example.school.model;
 
-import jakarta.persistence.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Professor {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String name;
-    // Other fields
+    private String nome;
+    private String sobrenome;
+    private Integer idade;
     
-    // Replace @OneToMany with @ManyToMany or use join table explicitly
-    // PostgreSQL prefers using join tables for collections rather than direct list mappings
-    @ManyToMany
-    @JoinTable(
-        name = "professor_materia", 
-        joinColumns = @JoinColumn(name = "professor_id"),
-        inverseJoinColumns = @JoinColumn(name = "materia_id")
-    )
-    private Set<Materia> materias = new HashSet<>();
-    
-    // Getters and setters
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
+    private List<Materia> materias = new ArrayList<>();
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -33,19 +32,38 @@ public class Professor {
         this.id = id;
     }
     
-    public String getName() {
-        return name;
+    public String getNome() {
+        return nome;
     }
     
-    public void setName(String name) {
-        this.name = name;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
     
-    public Set<Materia> getMaterias() {
+    public String getSobrenome() {
+        return sobrenome;
+    }
+    
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
+    }
+    
+    public Integer getIdade() {
+        return idade;
+    }
+    
+    public void setIdade(Integer idade) {
+        this.idade = idade;
+    }
+
+    public List<Materia> getMaterias() {
+        if (materias == null) {
+            materias = new ArrayList<>();
+        }
         return materias;
     }
-    
-    public void setMaterias(Set<Materia> materias) {
+
+    public void setMaterias(List<Materia> materias) {
         this.materias = materias;
     }
 }

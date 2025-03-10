@@ -1,11 +1,20 @@
 package com.example.school.dto;
 
 public class ProfessorDTO {
+    private Long id;
     private String nome;
     private String sobrenome;
     private Integer idade;
 
     // Getters e Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getNome() {
         return nome;
     }
