@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +35,19 @@ public class Aluno {
     private Integer idade;
     private String turma;
 
-    @ManyToMany(mappedBy = "alunos", fetch = jakarta.persistence.FetchType.LAZY)
+    @OneToMany(mappedBy = "aluno")
     @Builder.Default
-    private List<Materia> materias = new ArrayList<>();
+    private List<AlunoMateria> alunoMaterias = new ArrayList<>();
+    
+    public void matricularEm(Materia materia) {
+        AlunoMateria alunoMateria = AlunoMateria.builder()
+            .alunoId(this.getId())
+            .materiaId(materia.getId())
+            .aluno(this)
+            .materia(materia)
+            .build();
+            
+        this.alunoMaterias.add(alunoMateria);
+        materia.getMateriaAlunos().add(alunoMateria);
+    }
 }

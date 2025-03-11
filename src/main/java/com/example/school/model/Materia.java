@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,13 +41,8 @@ public class Materia {
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
-    @ManyToMany
-    @JoinTable(
-        name = "aluno_materia",
-        joinColumns = @JoinColumn(name = "materia_id"),
-        inverseJoinColumns = @JoinColumn(name = "aluno_id")
-    )
+    @OneToMany(mappedBy = "materia")
     @Builder.Default
-    private List<Aluno> alunos = new ArrayList<>();
+    private List<AlunoMateria> materiaAlunos = new ArrayList<>();
 }
 
