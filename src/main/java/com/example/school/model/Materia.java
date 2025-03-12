@@ -44,5 +44,10 @@ public class Materia {
     @OneToMany(mappedBy = "materia")
     @Builder.Default
     private List<AlunoMateria> materiaAlunos = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "materia")
+    @Builder.Default
+    private List<ProfessorMateria> materiaProfessores = new ArrayList<>();
+
 }
 
