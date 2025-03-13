@@ -1,18 +1,37 @@
 package com.example.school.exception;
 
+import java.time.LocalDateTime;
+
 public class ErrorResponse {
     private String code;
     private String message;
     private int status;
     private String error;
     private String path;
+    private String timestamp;
 
     public ErrorResponse() {
+        this.timestamp = LocalDateTime.now().toString();
     }
 
     public ErrorResponse(String code, String message) {
+        this();
         this.code = code;
         this.message = message;
+    }
+
+    public ErrorResponse(String code, String error, String message, int status) {
+        this(code, message);
+        this.error = error;
+        this.status = status;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getCode() {

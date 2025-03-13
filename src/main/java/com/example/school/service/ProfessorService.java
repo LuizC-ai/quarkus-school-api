@@ -9,6 +9,7 @@ import com.example.school.repository.ProfessorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.BadRequestException;
 
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +63,11 @@ public class ProfessorService {
     }
     
     public List<ProfessorDTO> findByNome(String nome) {
-        Objects.requireNonNull(nome, "Nome não pode ser nulo");
+        // Adicionada validação que estava no resource
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new BadRequestException("Parâmetro 'nome' é obrigatório");
+        }
+        
         return entityMapper.toProfessorDTOList(professorRepository.list("nome", nome));
     }
     

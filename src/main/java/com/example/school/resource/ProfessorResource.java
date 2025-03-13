@@ -38,14 +38,8 @@ public class ProfessorResource {
     @POST
     public Response createProfessor(@Valid ProfessorDTO professorDTO, @Context UriInfo uriInfo) {
         ProfessorDTO created = professorService.create(professorDTO);
-        
-        if (created.getId() != null) {
-            URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
-            return Response.created(uri).entity(created).build();
-        } else {
-            // Log this situation as it shouldn't happen in a properly implemented service
-            return Response.status(Response.Status.CREATED).entity(created).build();
-        }
+        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+        return Response.created(uri).entity(created).build();
     }
     
     @PUT
@@ -65,11 +59,6 @@ public class ProfessorResource {
     @GET
     @Path("/search")
     public Response findByNome(@QueryParam("nome") String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Parâmetro 'nome' é obrigatório")
-                    .build();
-        }
         List<ProfessorDTO> professors = professorService.findByNome(nome);
         return Response.ok(professors).build();
     }

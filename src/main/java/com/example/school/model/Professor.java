@@ -28,8 +28,6 @@ public class Professor {
     @Getter
     private Integer idade;
 
-    @OneToMany( mappedBy = "professor", cascade = CascadeType.ALL )
-    private List<ProfessorMateria> professorMaterias = new ArrayList<>( );
 
     public void setId( Long id ) {
         this.id = id;
@@ -54,16 +52,5 @@ public class Professor {
     public List<ProfessorMateria> getProfessorMaterias() {
         return professorMaterias;
     }
-    
-    public void cadastrarProfessorMateria(Materia materia) {
-        ProfessorMateria professorMateria = ProfessorMateria.builder()
-            .professorId(this.getId())
-            .materiaId(materia.getId())
-            .professor(this)
-            .materia(materia)
-            .build();
-            
-        this.professorMaterias.add(professorMateria);
-        materia.getMateriaProfessores().add(professorMateria);
-    }
+
 }

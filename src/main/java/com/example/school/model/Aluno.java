@@ -35,19 +35,5 @@ public class Aluno {
     private Integer idade;
     private String turma;
 
-    @OneToMany(mappedBy = "aluno")
-    @Builder.Default
-    private List<AlunoMateria> alunoMaterias = new ArrayList<>();
-    
-    public void matricularEm(Materia materia) {
-        AlunoMateria alunoMateria = AlunoMateria.builder()
-            .alunoId(this.getId())
-            .materiaId(materia.getId())
-            .aluno(this)
-            .materia(materia)
-            .build();
-            
-        this.alunoMaterias.add(alunoMateria);
-        materia.getMateriaAlunos().add(alunoMateria);
-    }
+
 }

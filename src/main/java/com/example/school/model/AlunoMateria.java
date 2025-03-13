@@ -1,6 +1,7 @@
 package com.example.school.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,23 +12,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlunoMateria {
+public class AlunoMateria extends ModeloIdBase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "aluno_id", nullable = false)
-    private Long alunoId;
-
-    @Column(name = "materia_id", nullable = false)
-    private Long materiaId;
-
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "aluno_id", insertable = false, updatable = false)
     private Aluno aluno;
 
+    @NotNull
     @ManyToOne
-    @JoinColumn(name = "materia_id", insertable = false, updatable = false)
     private Materia materia;
+    
+    @Override
+    protected String definirPrefixo() {
+        return "AM"; // AlunoMateria
+    }
 }
