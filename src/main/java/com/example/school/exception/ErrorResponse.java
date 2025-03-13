@@ -1,7 +1,5 @@
 package com.example.school.exception;
 
-import jakarta.ws.rs.core.Response.Status;
-
 public class ErrorResponse {
     private String code;
     private String message;

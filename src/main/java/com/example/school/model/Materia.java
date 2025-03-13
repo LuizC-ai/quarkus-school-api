@@ -8,8 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -44,5 +42,10 @@ public class Materia {
     @OneToMany(mappedBy = "materia")
     @Builder.Default
     private List<AlunoMateria> materiaAlunos = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "materia")
+    @Builder.Default
+    private List<ProfessorMateria> materiaProfessores = new ArrayList<>();
+
 }
 
