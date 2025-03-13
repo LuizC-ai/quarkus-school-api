@@ -13,4 +13,9 @@ public class MateriaDTO {
     private Long id;
     private String nome;
     private ProfessorDTO professor;
+    
+    // Adicionando o campo faltante
+    private Integer quantidadeHoras;
+    
+    // Outros campos...
 }

@@ -1,9 +1,5 @@
 package com.example.school.service;
 
-import com.example.school.model.Aluno;
-import com.example.school.model.Materia;
-
-import io.quarkus.hibernate.orm.runtime.dev.HibernateOrmDevInfo.Entity;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;

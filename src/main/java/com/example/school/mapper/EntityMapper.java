@@ -1,61 +1,62 @@
 package com.example.school.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
 import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
 import com.example.school.dto.ProfessorDTO;
 import com.example.school.model.Aluno;
-import com.example.school.model.AlunoMateria;
 import com.example.school.model.Materia;
 import com.example.school.model.Professor;
 
+import org.mapstruct.*;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Mapper(componentModel = "cdi")
+@Mapper(
+    componentModel = "cdi", 
+    uses = {},
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    unmappedSourcePolicy = ReportingPolicy.IGNORE  // Adicione esta linha
+)
 public interface EntityMapper {
-
+    
     // Professor mappings
     ProfessorDTO toProfessorDTO(Professor professor);
-    Professor toProfessorEntity(ProfessorDTO dto);
+    Professor toProfessorEntity(ProfessorDTO professorDTO);
     List<ProfessorDTO> toProfessorDTOList(List<Professor> professors);
+    void updateProfessorFromDto(ProfessorDTO dto, @MappingTarget Professor entity);
     
-    // Adicionar método para atualizar entidade existente
-    void updateProfessorFromDto(ProfessorDTO dto, @MappingTarget Professor professor);
-
     // Materia mappings
+    @BeanMapping(ignoreUnmappedSourceProperties = {"materiaAlunos", "materiaProfessores"})
     MateriaDTO toMateriaDTO(Materia materia);
-    Materia toMateriaEntity(MateriaDTO dto);
+    
+    Materia toMateriaEntity(MateriaDTO materiaDTO);
+    
     List<MateriaDTO> toMateriaDTOList(List<Materia> materias);
     
-    // Adicionar método para atualizar entidade existente
-    void updateMateriaFromDto(MateriaDTO dto, @MappingTarget Materia materia);
-
+    @Mapping(target = "materiaAlunos", ignore = true)
+    @Mapping(target = "materiaProfessores", ignore = true)
+    void updateMateriaFromDto(MateriaDTO dto, @MappingTarget Materia entity);
+    
     // Aluno mappings
-    @Mapping(target = "materias", ignore = true)
+    @Mapping(target = "nome", expression = "java(aluno.getNome() + \" \" + aluno.getSobrenome())")
+    @Mapping(target = "email", constant = "")
+    @Mapping(source = "alunoMaterias", target = "materias")
     AlunoDTO toAlunoDTO(Aluno aluno);
     
-    @Mapping(target = "materias", ignore = true)
-    Aluno toAlunoEntity(AlunoDTO dto);
+    @Mapping(target = "nome", expression = "java(splitNome(alunoDTO.getNome())[0])")
+    @Mapping(target = "sobrenome", expression = "java(splitNome(alunoDTO.getNome())[1])")
+    @Mapping(target = "alunoMaterias", ignore = true)
+    Aluno toAlunoEntity(AlunoDTO alunoDTO);
     
-    List<AlunoDTO> toAlunoDTOList(List<Aluno> alunos);
+    @Mapping(target = "nome", expression = "java(splitNome(dto.getNome())[0])")
+    @Mapping(target = "sobrenome", expression = "java(splitNome(dto.getNome())[1])")
+    @Mapping(target = "alunoMaterias", ignore = true)
+    void updateAlunoFromDto(AlunoDTO dto, @MappingTarget Aluno entity);
     
-    // Adicionar método para atualizar entidade existente
-    @Mapping(target = "materias", ignore = true)
-    void updateAlunoFromDto(AlunoDTO dto, @MappingTarget Aluno aluno);
-    
-    default AlunoDTO toAlunoDTOWithMaterias(Aluno aluno, List<AlunoMateria> alunoMaterias) {
-        AlunoDTO dto = toAlunoDTO(aluno);
-        
-        List<MateriaDTO> materias = alunoMaterias.stream()
-            .filter(am -> am.getAlunoId().equals(aluno.getId()))
-            .map(am -> toMateriaDTO(am.getMateria()))
-            .collect(Collectors.toList());
-        
-        dto.setMaterias(materias);
-        return dto;
+    // Método auxiliar para separar nome e sobrenome
+    default String[] splitNome(String nomeCompleto) {
+        if (nomeCompleto == null) return new String[] {"", ""};
+        String[] parts = nomeCompleto.split(" ", 2);
+        return parts.length > 1 ? parts : new String[] {parts[0], ""};
     }
 }

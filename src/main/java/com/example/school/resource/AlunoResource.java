@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
+import com.example.school.dto.ProfessorDTO;
 import com.example.school.model.Aluno;
 import com.example.school.service.AlunoService;
 import com.example.school.mapper.AlunoMapper;
