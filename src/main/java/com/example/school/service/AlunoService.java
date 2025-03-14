@@ -3,17 +3,20 @@ package com.example.school.service;
 import com.example.school.model.Aluno;
 import com.example.school.model.Materia;
 import com.example.school.model.AlunoMateria;
+import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
 import com.example.school.dto.ProfessorDTO;
 import com.example.school.repository.AlunoRepository;
 import com.example.school.repository.MateriaRepository;
 import com.example.school.repository.AlunoMateriaRepository;
+import com.example.school.mapper.AlunoMapper;
 import com.example.school.mapper.MateriaMapper;
 import com.example.school.mapper.ProfessorMapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
@@ -32,58 +35,55 @@ public class AlunoService {
     AlunoMateriaRepository alunoMateriaRepository;
     
     @Inject
+    AlunoMapper alunoMapper;
+    
+    @Inject
     MateriaMapper materiaMapper;
     
     @Inject
     ProfessorMapper professorMapper;
     
-    public List<Aluno> listAll() {
-        return alunoRepository.listAll();
+    public List<AlunoDTO> findAll() {
+        return alunoMapper.toDTOList(alunoRepository.listAll());
     }
     
-    public Aluno findById(Long id) {
-        return alunoRepository.findByIdOptional(id)
+    public AlunoDTO findById(Long id) {
+        Aluno aluno = alunoRepository.findByIdOptional(id)
             .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
+        return alunoMapper.toDTO(aluno);
     }
     
     @Transactional
-    public Aluno create(Aluno aluno) {
+    public AlunoDTO create(AlunoDTO alunoDTO) {
+        Aluno aluno = alunoMapper.toEntity(alunoDTO);
         alunoRepository.persist(aluno);
-        return aluno;
+        return alunoMapper.toDTO(aluno);
     }
     
     @Transactional
-    public Aluno update(Long id, Aluno aluno) {
-        Aluno entity = findById(id);
+    public AlunoDTO update(Long id, AlunoDTO alunoDTO) {
+        Aluno entity = alunoRepository.findByIdOptional(id)
+            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
         
-        if (aluno.getNome() != null) entity.setNome(aluno.getNome());
-        if (aluno.getSobrenome() != null) entity.setSobrenome(aluno.getSobrenome());
-        if (aluno.getIdade() != null) entity.setIdade(aluno.getIdade());
-        if (aluno.getTurma() != null) entity.setTurma(aluno.getTurma());
+        alunoMapper.updateEntityFromDTO(alunoDTO, entity);
         
-        return entity;
+        return alunoMapper.toDTO(entity);
     }
     
     @Transactional
     public void delete(Long id) {
-        Aluno aluno = findById(id);
+        Aluno aluno = alunoRepository.findByIdOptional(id)
+            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
         alunoRepository.delete(aluno);
-    }
-
-    public List<Aluno> findAll() {
-        return alunoRepository.listAll();
     }
     
     /**
      * Recupera todas as matérias em que um aluno está matriculado
-     * 
-     * @param id ID do aluno
-     * @return Lista de DTOs de matérias
-     * @throws NotFoundException se o aluno não for encontrado
      */
     public List<MateriaDTO> getMateriasByAluno(Long id) {
         // Primeiro verificamos se o aluno existe
-        Aluno aluno = findById(id);
+        alunoRepository.findByIdOptional(id)
+            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
         
         // Buscamos todas as relações aluno-materia para este aluno
         List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoId(id);
@@ -96,50 +96,48 @@ public class AlunoService {
     
     /**
      * Recupera todos os professores das matérias em que um aluno está matriculado
-     *
-     * @param id ID do aluno
-     * @return Lista de DTOs de professores
-     * @throws NotFoundException se o aluno não for encontrado
      */
     public List<ProfessorDTO> getProfessoresByAluno(Long id) {
         // Verificar se o aluno existe
-        Aluno aluno = findById(id);
+        alunoRepository.findByIdOptional(id)
+            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
         
         // Buscar todas as matérias do aluno
         List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoId(id);
         
-        // Coletar professores únicos (uma matéria pode ter apenas um professor)
+        // Coletar professores únicos
         return matriculas.stream()
             .map(am -> am.getMateria())
-            .filter(materia -> materia.getProfessor() != null) // Ignora matérias sem professor
+            .filter(materia -> materia.getProfessor() != null)
             .map(materia -> professorMapper.toDTO(materia.getProfessor()))
-            .distinct() // Remove duplicatas (caso o aluno tenha mais de uma matéria com mesmo professor)
+            .distinct()
             .collect(Collectors.toList());
     }
     
     /**
      * Matricula um aluno em uma matéria
-     * 
-     * @param alunoId ID do aluno
-     * @param materiaId ID da matéria
-     * @return O aluno após matriculado
-     * @throws NotFoundException se o aluno ou a matéria não forem encontrados
      */
     @Transactional
-    public Aluno matricularEmMateria(Long alunoId, Long materiaId) {
+    public AlunoDTO matricularEmMateria(Long alunoId, Long materiaId) {
         // Buscar o aluno e a matéria, lançando exceção se não encontrados
-        Aluno aluno = findById(alunoId);
+        Aluno aluno = alunoRepository.findByIdOptional(alunoId)
+            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + alunoId));
         
         Materia materia = materiaRepository.findByIdOptional(materiaId)
             .orElseThrow(() -> new NotFoundException("Matéria não encontrada com id: " + materiaId));
         
-        // Criar a associação entre aluno e matéria usando o método já existente no modelo
-        aluno.matricularEm(materia);
+        // Verificar se o aluno já está matriculado nesta matéria
+        boolean jaMatriculado = alunoMateriaRepository.find("aluno.id = ?1 AND materia.id = ?2", 
+                                                          alunoId, materiaId).count() > 0;
         
-        // Persistir a associação (o método matricularEm já criou o objeto AlunoMateria, 
-        // mas ainda precisamos persistir)
-        // Como estamos dentro de uma transação, as alterações serão commitadas ao final
+        if (!jaMatriculado) {
+            // Criar a associação entre aluno e matéria
+            AlunoMateria alunoMateria = new AlunoMateria();
+            alunoMateria.setAluno(aluno);
+            alunoMateria.setMateria(materia);
+            alunoMateriaRepository.persist(alunoMateria);
+        }
         
-        return aluno;
+        return alunoMapper.toDTO(aluno);
     }
 }

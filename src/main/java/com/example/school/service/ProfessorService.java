@@ -2,7 +2,7 @@ package com.example.school.service;
 
 import com.example.school.dto.ProfessorDTO;
 import com.example.school.exception.ResourceNotFoundException;
-import com.example.school.mapper.EntityMapper;
+import com.example.school.mapper.ProfessorMapper;
 import com.example.school.model.Professor;
 import com.example.school.repository.ProfessorRepository;
 
@@ -21,15 +21,15 @@ public class ProfessorService {
     ProfessorRepository professorRepository;
     
     @Inject
-    EntityMapper entityMapper;
+    ProfessorMapper mapper;
     
     public List<ProfessorDTO> findAll() {
-        return entityMapper.toProfessorDTOList(professorRepository.listAll());
+        return mapper.toDTOList(professorRepository.listAll());
     }
     
     public ProfessorDTO findById(Long id) {
         Professor professor = findEntityById(id);
-        return entityMapper.toProfessorDTO(professor);
+        return mapper.toDTO(professor);
     }
     
     @Transactional
@@ -40,9 +40,9 @@ public class ProfessorService {
             professorDTO.setId(null); // Forçar criação de novo registro
         }
         
-        Professor professor = entityMapper.toProfessorEntity(professorDTO);
+        Professor professor = mapper.toEntity(professorDTO);
         professorRepository.persist(professor);
-        return entityMapper.toProfessorDTO(professor);
+        return mapper.toDTO(professor);
     }
     
     @Transactional
@@ -51,9 +51,9 @@ public class ProfessorService {
         Objects.requireNonNull(id, "ID não pode ser nulo");
         
         Professor entity = findEntityById(id);
-        entityMapper.updateProfessorFromDto(professorDTO, entity);
+        mapper.updateEntityFromDTO(professorDTO, entity);
         
-        return entityMapper.toProfessorDTO(entity);
+        return mapper.toDTO(entity);
     }
     
     @Transactional
@@ -68,7 +68,7 @@ public class ProfessorService {
             throw new BadRequestException("Parâmetro 'nome' é obrigatório");
         }
         
-        return entityMapper.toProfessorDTOList(professorRepository.list("nome", nome));
+        return mapper.toDTOList(professorRepository.list("nome", nome));
     }
     
     /**

@@ -15,6 +15,9 @@ public class AlunoDTO {
     private Long id;
     private String nome;
     private String email;
+    private String sobrenome;
+    private Integer idade;
+    private String turma;
     private List<MateriaDTO> materias;
 }
 

@@ -12,12 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Professor {
-
-    @Getter
-    @Id
-    @GeneratedValue( strategy = GenerationType.IDENTITY )
-    private Long id;
+public class Professor extends ModeloIdBase {
 
     @Getter
     private String nome;
@@ -27,11 +22,6 @@ public class Professor {
 
     @Getter
     private Integer idade;
-
-
-    public void setId( Long id ) {
-        this.id = id;
-    }
 
     public void setNome( String nome ) {
         this.nome = nome;
@@ -43,14 +33,6 @@ public class Professor {
 
     public void setIdade( Integer idade ) {
         this.idade = idade;
-    }
-
-    public void setMaterias( List<ProfessorMateria> professorMaterias ) {
-        this.professorMaterias = professorMaterias;
-    }
-    
-    public List<ProfessorMateria> getProfessorMaterias() {
-        return professorMaterias;
     }
 
 }

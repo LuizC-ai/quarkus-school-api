@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,15 +25,15 @@ import lombok.ToString;
 @ToString
 @Builder
 @Table(name = "alunos")
-public class Aluno {
+public class Aluno extends ModeloIdBase {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @NotBlank
     private String nome;
+
     private String sobrenome;
+
     private Integer idade;
+
     private String turma;
 
 

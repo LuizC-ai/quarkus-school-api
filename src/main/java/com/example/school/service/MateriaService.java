@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.example.school.dto.MateriaDTO;
 import com.example.school.exception.ResourceNotFoundException;
-import com.example.school.mapper.EntityMapper;
+import com.example.school.mapper.MateriaMapper;
 import com.example.school.model.Materia;
 import com.example.school.model.Professor;
 import com.example.school.repository.MateriaRepository;
@@ -25,15 +25,16 @@ public class MateriaService {
     ProfessorRepository professorRepository;
     
     @Inject
-    EntityMapper entityMapper;
+    MateriaMapper mapper;
     
     public List<MateriaDTO> findAll() {
-        return entityMapper.toMateriaDTOList(materiaRepository.listAll());
+        List<Materia> materias = materiaRepository.listAll();
+        return mapper.toDTOList(materias);
     }
     
     public MateriaDTO findById(Long id) {
         Materia materia = findEntityById(id);
-        return entityMapper.toMateriaDTO(materia);
+        return mapper.toDTO(materia);
     }
     
     @Transactional
@@ -44,9 +45,9 @@ public class MateriaService {
             materiaDTO.setId(null); // Forçar criação de novo registro
         }
         
-        Materia materia = entityMapper.toMateriaEntity(materiaDTO);
+        Materia materia = mapper.toEntity(materiaDTO);
         materiaRepository.persist(materia);
-        return entityMapper.toMateriaDTO(materia);
+        return mapper.toDTO(materia);
     }
     
     @Transactional
@@ -55,9 +56,9 @@ public class MateriaService {
         Objects.requireNonNull(id, "ID não pode ser nulo");
         
         Materia entity = findEntityById(id);
-        entityMapper.updateMateriaFromDto(materiaDTO, entity);
+        mapper.updateEntityFromDTO(materiaDTO, entity);
         
-        return entityMapper.toMateriaDTO(entity);
+        return mapper.toDTO(entity);
     }
     
     @Transactional
@@ -77,7 +78,7 @@ public class MateriaService {
         
         materia.setProfessor(professor);
         
-        return entityMapper.toMateriaDTO(materia);
+        return mapper.toDTO(materia);
     }
     
     /**
