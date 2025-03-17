@@ -16,7 +16,6 @@ import com.example.school.mapper.ProfessorMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
