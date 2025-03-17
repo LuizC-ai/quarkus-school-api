@@ -61,14 +61,14 @@ public class AlunoResource {
     @GET
     @Path("/{identificador}/materias")
     public Response getMateriasByAluno(@PathParam("identificador") String identificador) {
-        List<MateriaDTO> materias = alunoService.getMateriasByAluno(identificador);
+        List<MateriaDTO> materias = alunoService.getMateriasByAlunoIdentificador(identificador);
         return Response.ok(materias).build();
     }
     
     @GET
     @Path("/{identificador}/professores")
     public Response getProfessoresByAluno(@PathParam("identificador") String identificador) {
-        List<ProfessorDTO> professores = alunoService.getProfessoresByAluno(identificador);
+        List<ProfessorDTO> professores = alunoService.getProfessoresByAlunoIdentificador(identificador);
         return Response.ok(professores).build();
     }
     

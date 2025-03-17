@@ -39,7 +39,8 @@ public class MateriaService {
     }
 
     public MateriaDTO findByIdentificador(String identificador) {
-        Materia materia = findEntityByIdentificador(identificador);
+        Materia materia = materiaRepository.findByIdentificador(identificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador));
         return mapper.toDTO(materia);
     }
 
@@ -70,25 +71,21 @@ public class MateriaService {
 
     @Transactional
     public void delete(String identificador) {
-        Materia entity = findEntityByIdentificador(identificador);
-        materiaRepository.delete(entity);
+        if(!materiaRepository.deleteByIdentificador(identificador)) {
+            throw new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador);
+        }
     }
-    
+
     @Transactional
     public MateriaDTO associarProfessor(String materiaIdentificador, String professorIdentificador) {
+        Materia materia = materiaRepository.findByIdentificador(materiaIdentificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + materiaIdentificador));
 
-        Materia materia = materiaRepository.find( "identificador" , materiaIdentificador).singleResult();
-        
-        Professor professor = professorRepository.find( "identificador" , professorIdentificador).firstResult();
-        if(professor == null) {
-            throw new ResourceNotFoundException( "Professor não encontrado com id: " + professorIdentificador );
-        }
+        Professor professor = professorRepository.findByIdentificador(professorIdentificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + professorIdentificador));
 
         boolean jaAssociado = professorMateriaRepository
-                .find("professor.identificador = ?1 and materia.identificador = ?2",
-                        professorIdentificador, materiaIdentificador)
-                .firstResultOptional()
-                .isPresent();
+                .existsByProfessorAndMateriaIdentificador(professorIdentificador, materiaIdentificador);
 
         if (!jaAssociado) {
             ProfessorMateria professorMateria = new ProfessorMateria();
@@ -99,7 +96,7 @@ public class MateriaService {
 
         return mapper.toDTO(materia);
     }
-    
+
     /**
      * Método auxiliar para recuperar entidade por ID ou lançar exceção
      */

@@ -27,8 +27,9 @@ public class ProfessorService {
         return mapper.toDTOList(professorRepository.listAll());
     }
     
-    public ProfessorDTO findById(Long id) {
-        Professor professor = findEntityById(id);
+    public ProfessorDTO findByIdentificador(String identificador) {
+        Professor professor = professorRepository.findByIdentificador(identificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador));
         return mapper.toDTO(professor);
     }
     
