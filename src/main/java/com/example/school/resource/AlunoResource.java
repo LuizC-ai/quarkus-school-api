@@ -31,51 +31,51 @@ public class AlunoResource {
     }
 
     @GET
-    @Path("/{id}")
-    public Response getById(@PathParam("id") Long id) {
-        AlunoDTO aluno = alunoService.findById(id);
+    @Path("/{identificador}")
+    public Response getById(@PathParam("identificador") String identificador) {
+        AlunoDTO aluno = alunoService.findByIdentificador(identificador);
         return Response.ok(aluno).build();
     }
 
     @POST
     public Response create(@Valid AlunoDTO alunoDTO, @Context UriInfo uriInfo) {
         AlunoDTO created = alunoService.create(alunoDTO);
-        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getIdentificador())).build();
         return Response.created(uri).entity(created).build();
     }
 
     @PUT
-    @Path("/{id}")
-    public Response update(@PathParam("id") Long id, @Valid AlunoDTO alunoDTO) {
-        AlunoDTO updated = alunoService.update(id, alunoDTO);
+    @Path("/{identificador}")
+    public Response update(@PathParam("identificador") String identificador, @Valid AlunoDTO alunoDTO) {
+        AlunoDTO updated = alunoService.update(identificador, alunoDTO);
         return Response.ok(updated).build();
     }
 
     @DELETE
-    @Path("/{id}")
-    public Response delete(@PathParam("id") Long id) {
-        alunoService.delete(id);
+    @Path("/{identificador}")
+    public Response delete(@PathParam("identificador") String identificador) {
+        alunoService.delete(identificador);
         return Response.noContent().build();
     }
     
     @GET
-    @Path("/{id}/materias")
-    public Response getMateriasByAluno(@PathParam("id") Long id) {
-        List<MateriaDTO> materias = alunoService.getMateriasByAluno(id);
+    @Path("/{identificador}/materias")
+    public Response getMateriasByAluno(@PathParam("identificador") String identificador) {
+        List<MateriaDTO> materias = alunoService.getMateriasByAluno(identificador);
         return Response.ok(materias).build();
     }
     
     @GET
-    @Path("/{id}/professores")
-    public Response getProfessoresByAluno(@PathParam("id") Long id) {
-        List<ProfessorDTO> professores = alunoService.getProfessoresByAluno(id);
+    @Path("/{identificador}/professores")
+    public Response getProfessoresByAluno(@PathParam("identificador") String identificador) {
+        List<ProfessorDTO> professores = alunoService.getProfessoresByAluno(identificador);
         return Response.ok(professores).build();
     }
     
     @PUT
-    @Path("/{id}/materia/{materiaId}")
-    public Response matricularEmMateria(@PathParam("id") Long id, @PathParam("materiaId") Long materiaId) {
-        AlunoDTO aluno = alunoService.matricularEmMateria(id, materiaId);
+    @Path("/{identificador}/materia/{materiaIdentificador}")
+    public Response matricularEmMateria(@PathParam("identificador") String identificador, @PathParam("materiaIdentificador") String materiaIdentificador) {
+        AlunoDTO aluno = alunoService.matricularEmMateria(identificador, materiaIdentificador);
         return Response.ok(aluno).build();
     }
 }

@@ -8,16 +8,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MateriaDTO {
-    private Long id;
+public class MateriaDTO extends BaseDTO {
+
     private String nome;
     private Professor professor;
     
-    // Adicionando o campo faltante
+
     private Integer quantidadeHoras;
     
-    // Outros campos...
+
 }

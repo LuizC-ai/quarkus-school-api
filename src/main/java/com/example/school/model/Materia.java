@@ -6,20 +6,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.example.school.core.ModeloIdBase;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@ToString
-@Builder
 @Table(name = "materias")
 public class Materia extends ModeloIdBase {
 
@@ -38,9 +34,5 @@ public class Materia extends ModeloIdBase {
         this.professor = professor;
     }
 
-    @Override
-    protected String definirPrefixo() {
-        return "MAT"; // Materia
-    }
 }
 

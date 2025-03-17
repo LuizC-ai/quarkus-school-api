@@ -1,19 +1,18 @@
 package com.example.school.dto;
 
-public class ProfessorDTO {
-    private Long id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProfessorDTO extends BaseDTO {
+
     private String nome;
     private String sobrenome;
     private Integer idade;
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;

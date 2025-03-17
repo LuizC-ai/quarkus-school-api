@@ -14,7 +14,7 @@ public class ProfessorMapper {
         if (entity == null) return null;
         
         ProfessorDTO dto = new ProfessorDTO();
-        dto.setId(entity.getId());
+        dto.setIdentificador(entity.getIdentificador());
         dto.setNome(entity.getNome());
         dto.setSobrenome(entity.getSobrenome());
         dto.setIdade(entity.getIdade());
@@ -27,11 +27,6 @@ public class ProfessorMapper {
         if (dto == null) return null;
         
         Professor entity = new Professor();
-        
-        // Se for uma atualização, não configuramos o ID
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
-        }
         
         entity.setNome(dto.getNome());
         entity.setSobrenome(dto.getSobrenome());

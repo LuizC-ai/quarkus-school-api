@@ -35,10 +35,7 @@ public class ProfessorService {
     @Transactional
     public ProfessorDTO create(ProfessorDTO professorDTO) {
         Objects.requireNonNull(professorDTO, "Professor não pode ser nulo");
-        
-        if (professorDTO.getId() != null) {
-            professorDTO.setId(null); // Forçar criação de novo registro
-        }
+
         
         Professor professor = mapper.toEntity(professorDTO);
         professorRepository.persist(professor);

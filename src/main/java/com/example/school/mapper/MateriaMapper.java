@@ -14,6 +14,7 @@ public class MateriaMapper {
         if (entity == null) return null;
         
         MateriaDTO dto = new MateriaDTO();
+        dto.setIdentificador( entity.getIdentificador());
         dto.setNome(entity.getNome());
         dto.setProfessor(entity.getProfessor());
         dto.setQuantidadeHoras(entity.getQuantidadeHoras());
@@ -26,12 +27,7 @@ public class MateriaMapper {
         if (dto == null) return null;
         
         Materia entity = new Materia();
-        
-        // Se for uma atualização, não configuramos o ID
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
-        }
-        
+
         entity.setNome(dto.getNome());
         entity.setProfessor(dto.getProfessor());
         entity.setQuantidadeHoras(dto.getQuantidadeHoras());

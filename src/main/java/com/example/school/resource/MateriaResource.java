@@ -29,37 +29,37 @@ public class MateriaResource {
     }
 
     @GET
-    @Path("/{id}")
-    public Response getById(@PathParam("id") Long id) {
-        MateriaDTO materia = materiaService.findById(id);
+    @Path("/{identificador}")
+    public Response getById(@PathParam("identificador") String identificador) {
+        MateriaDTO materia = materiaService.findByIdentificador(identificador);
         return Response.ok(materia).build();
     }
 
     @POST
     public Response create(@Valid MateriaDTO materiaDTO, @Context UriInfo uriInfo) {
         MateriaDTO created = materiaService.create(materiaDTO);
-        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getIdentificador())).build();
         return Response.created(uri).entity(created).build();
     }
 
     @PUT
-    @Path("/{id}")
-    public Response update(@PathParam("id") Long id, @Valid MateriaDTO materiaDTO) {
-        MateriaDTO updated = materiaService.update(id, materiaDTO);
+    @Path("/{identificador}")
+    public Response update(@PathParam("identificador") String identificador, @Valid MateriaDTO materiaDTO) {
+        MateriaDTO updated = materiaService.update(identificador, materiaDTO);
         return Response.ok(updated).build();
     }
 
     @DELETE
-    @Path("/{id}")
-    public Response delete(@PathParam("id") Long id) {
-        materiaService.delete(id);
+    @Path("/{identificador}")
+    public Response delete(@PathParam("identificador") String identificador) {
+        materiaService.delete(identificador);
         return Response.noContent().build();
     }
     
     @PUT
-    @Path("/{id}/professor/{professorId}")
-    public Response associarProfessor(@PathParam("id") Long id, @PathParam("professorId") Long professorId) {
-        MateriaDTO materia = materiaService.associarProfessor(id, professorId);
+    @Path("/{identificador}/professor/{professorIdentificador}")
+    public Response associarProfessor(@PathParam("identificador") String identificador, @PathParam("professorIdentificador") String professorIdentificador) {
+        MateriaDTO materia = materiaService.associarProfessor(identificador, professorIdentificador);
         return Response.ok(materia).build();
     }
 }

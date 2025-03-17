@@ -1,5 +1,6 @@
 package com.example.school.service;
 
+import com.example.school.exception.ResourceNotFoundException;
 import com.example.school.model.Aluno;
 import com.example.school.model.Materia;
 import com.example.school.model.AlunoMateria;
@@ -19,6 +20,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -46,12 +48,14 @@ public class AlunoService {
         return alunoMapper.toDTOList(alunoRepository.listAll());
     }
     
-    public AlunoDTO findById(Long id) {
-        Aluno aluno = alunoRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
-        return alunoMapper.toDTO(aluno);
+    public AlunoDTO findByIdentificador(String identificador) {
+        Aluno aluno = alunoRepository.find( "identificador", identificador ).firstResult( );
+        if ( aluno == null ) {
+            throw new ResourceNotFoundException( "Aluno não encontrado com id: " + identificador );
+        }
+        return alunoMapper.toDTO( aluno );
     }
-    
+
     @Transactional
     public AlunoDTO create(AlunoDTO alunoDTO) {
         Aluno aluno = alunoMapper.toEntity(alunoDTO);
@@ -60,51 +64,46 @@ public class AlunoService {
     }
     
     @Transactional
-    public AlunoDTO update(Long id, AlunoDTO alunoDTO) {
-        Aluno entity = alunoRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
-        
+    public AlunoDTO update(String identificador, AlunoDTO alunoDTO) {
+        Aluno entity = alunoRepository.find( "identificador", identificador ).firstResult();
+        if (entity == null) {
+            throw new NotFoundException("Aluno não encontrado com id: " + identificador);
+        }
         alunoMapper.updateEntityFromDTO(alunoDTO, entity);
-        
         return alunoMapper.toDTO(entity);
     }
     
     @Transactional
-    public void delete(Long id) {
-        Aluno aluno = alunoRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
+    public void delete(String identificador) {
+        Aluno aluno = alunoRepository.find( "identificador", identificador ).firstResult();
+        if (aluno == null) {
+            throw new NotFoundException("Aluno não encontrado com id: " + identificador);
+        }
         alunoRepository.delete(aluno);
     }
     
-    /**
-     * Recupera todas as matérias em que um aluno está matriculado
-     */
-    public List<MateriaDTO> getMateriasByAluno(Long id) {
-        // Primeiro verificamos se o aluno existe
-        alunoRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
-        
-        // Buscamos todas as relações aluno-materia para este aluno
-        List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoId(id);
-        
-        // Convertemos para uma lista de MateriaDTO
+
+    public List<MateriaDTO> getMateriasByAlunoIdentificador(String identificador) {
+        Optional<Aluno> aluno = alunoRepository.find( "identificador", identificador ).singleResultOptional();
+        if (aluno.isEmpty()) {
+            throw new NotFoundException("Aluno não encontrado com id: " + identificador);
+        }
+
+        List<AlunoMateria> matriculas = alunoMateriaRepository.find("aluno.identificador", identificador).list();
+
         return matriculas.stream()
             .map(am -> materiaMapper.toDTO(am.getMateria()))
             .collect(Collectors.toList());
     }
-    
-    /**
-     * Recupera todos os professores das matérias em que um aluno está matriculado
-     */
-    public List<ProfessorDTO> getProfessoresByAluno(Long id) {
-        // Verificar se o aluno existe
-        alunoRepository.findByIdOptional(id)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + id));
-        
-        // Buscar todas as matérias do aluno
-        List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoId(id);
-        
-        // Coletar professores únicos
+
+    public List<ProfessorDTO> getProfessoresByAlunoIdentificador(String identificador) {
+        Aluno aluno = alunoRepository.find( "identificador", identificador ).firstResult();
+        if (aluno == null) {
+            throw new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador);
+        }
+
+        List<AlunoMateria> matriculas = alunoMateriaRepository.find("aluno.identificador", identificador).list();
+
         return matriculas.stream()
             .map(am -> am.getMateria())
             .filter(materia -> materia.getProfessor() != null)
@@ -112,31 +111,30 @@ public class AlunoService {
             .distinct()
             .collect(Collectors.toList());
     }
-    
-    /**
-     * Matricula um aluno em uma matéria
-     */
+
     @Transactional
-    public AlunoDTO matricularEmMateria(Long alunoId, Long materiaId) {
-        // Buscar o aluno e a matéria, lançando exceção se não encontrados
-        Aluno aluno = alunoRepository.findByIdOptional(alunoId)
-            .orElseThrow(() -> new NotFoundException("Aluno não encontrado com id: " + alunoId));
-        
-        Materia materia = materiaRepository.findByIdOptional(materiaId)
-            .orElseThrow(() -> new NotFoundException("Matéria não encontrada com id: " + materiaId));
-        
-        // Verificar se o aluno já está matriculado nesta matéria
-        boolean jaMatriculado = alunoMateriaRepository.find("aluno.id = ?1 AND materia.id = ?2", 
-                                                          alunoId, materiaId).count() > 0;
-        
+    public AlunoDTO matricularEmMateria(String alunoIdentificador, String materiaIdentificador){
+        Aluno aluno = alunoRepository.find( "identificador", alunoIdentificador ).firstResult();
+        if ( aluno == null ) {
+            throw new ResourceNotFoundException("Aluno não encontrado com identificador: " + alunoIdentificador);
+        }
+
+        Materia materia = materiaRepository.find("identificador", materiaIdentificador).firstResult();
+        if (materia == null) {
+            throw new ResourceNotFoundException("Matéria não encontrada com identificador: " + materiaIdentificador);
+        }
+
+        boolean jaMatriculado = alunoMateriaRepository.find(
+                "aluno.identificador = ?1 AND materia.identificador = ?2",
+                alunoIdentificador, materiaIdentificador).count() > 0;
+
         if (!jaMatriculado) {
-            // Criar a associação entre aluno e matéria
             AlunoMateria alunoMateria = new AlunoMateria();
             alunoMateria.setAluno(aluno);
             alunoMateria.setMateria(materia);
             alunoMateriaRepository.persist(alunoMateria);
         }
-        
+
         return alunoMapper.toDTO(aluno);
     }
 }

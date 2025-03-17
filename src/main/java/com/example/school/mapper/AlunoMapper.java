@@ -14,7 +14,7 @@ public class AlunoMapper {
         if (entity == null) return null;
         
         AlunoDTO dto = new AlunoDTO();
-        dto.setId(entity.getId());
+        dto.setIdentificador(entity.getIdentificador());
         dto.setNome(entity.getNome());
         dto.setSobrenome(entity.getSobrenome());
         dto.setIdade(entity.getIdade());
@@ -27,11 +27,6 @@ public class AlunoMapper {
         if (dto == null) return null;
         
         Aluno entity = new Aluno();
-        
-        // Se for uma atualização, não configuramos o ID
-        if (dto.getId() != null) {
-            entity.setId(dto.getId());
-        }
         
         entity.setNome(dto.getNome());
         entity.setSobrenome(dto.getSobrenome());

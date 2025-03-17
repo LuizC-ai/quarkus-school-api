@@ -1,5 +1,6 @@
 package com.example.school.model;
 
+import com.example.school.core.ModeloIdBase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProfessorMateria extends ModeloIdBase {
@@ -21,9 +21,5 @@ public class ProfessorMateria extends ModeloIdBase {
     @NotNull
     @ManyToOne
     private Materia materia;
-    
-    @Override
-    protected String definirPrefixo() {
-        return "PM"; // ProfessorMateria
-    }
+
 }

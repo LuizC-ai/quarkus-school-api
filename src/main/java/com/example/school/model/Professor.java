@@ -1,8 +1,15 @@
 package com.example.school.model;
 
+import com.example.school.core.ModeloIdBase;
 import jakarta.persistence.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 public class Professor extends ModeloIdBase {
 

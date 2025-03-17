@@ -38,7 +38,7 @@ public class ProfessorResource {
     @POST
     public Response createProfessor(@Valid ProfessorDTO professorDTO, @Context UriInfo uriInfo) {
         ProfessorDTO created = professorService.create(professorDTO);
-        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+        URI uri = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getIdentificador())).build();
         return Response.created(uri).entity(created).build();
     }
     

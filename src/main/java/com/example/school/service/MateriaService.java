@@ -2,13 +2,16 @@ package com.example.school.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.example.school.dto.MateriaDTO;
 import com.example.school.exception.ResourceNotFoundException;
 import com.example.school.mapper.MateriaMapper;
 import com.example.school.model.Materia;
 import com.example.school.model.Professor;
+import com.example.school.model.ProfessorMateria;
 import com.example.school.repository.MateriaRepository;
+import com.example.school.repository.ProfessorMateriaRepository;
 import com.example.school.repository.ProfessorRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -26,58 +29,74 @@ public class MateriaService {
     
     @Inject
     MateriaMapper mapper;
+
+    @Inject
+    ProfessorMateriaRepository professorMateriaRepository;
     
     public List<MateriaDTO> findAll() {
         List<Materia> materias = materiaRepository.listAll();
         return mapper.toDTOList(materias);
     }
-    
-    public MateriaDTO findById(Long id) {
-        Materia materia = findEntityById(id);
+
+    public MateriaDTO findByIdentificador(String identificador) {
+        Materia materia = findEntityByIdentificador(identificador);
         return mapper.toDTO(materia);
     }
-    
+
     @Transactional
     public MateriaDTO create(MateriaDTO materiaDTO) {
-        Objects.requireNonNull(materiaDTO, "Materia não pode ser nula");
-        
-        if (materiaDTO.getId() != null) {
-            materiaDTO.setId(null); // Forçar criação de novo registro
-        }
-        
         Materia materia = mapper.toEntity(materiaDTO);
         materiaRepository.persist(materia);
         return mapper.toDTO(materia);
     }
-    
+
     @Transactional
-    public MateriaDTO update(Long id, MateriaDTO materiaDTO) {
+    public MateriaDTO update(String identificador, MateriaDTO materiaDTO) {
         Objects.requireNonNull(materiaDTO, "Materia não pode ser nula");
-        Objects.requireNonNull(id, "ID não pode ser nulo");
-        
-        Materia entity = findEntityById(id);
+
+        Materia entity = findEntityByIdentificador(identificador);
         mapper.updateEntityFromDTO(materiaDTO, entity);
-        
+
         return mapper.toDTO(entity);
     }
-    
-    @Transactional
-    public void delete(Long id) {
-        boolean deleted = materiaRepository.deleteById(id);
-        if (!deleted) {
-            throw new ResourceNotFoundException("Materia não encontrada com id: " + id);
+
+    private Materia findEntityByIdentificador( String identificador ) {
+        Optional<Materia> materia = materiaRepository.find( "identificador" , identificador).singleResultOptional();
+        if ( materia.isEmpty( ) ) {
+            throw new ResourceNotFoundException("Materia não encontrada com id: " + identificador);
         }
+        return materia.get( );
+    }
+
+    @Transactional
+    public void delete(String identificador) {
+        Materia entity = findEntityByIdentificador(identificador);
+        materiaRepository.delete(entity);
     }
     
     @Transactional
-    public MateriaDTO associarProfessor(Long materiaId, Long professorId) {
-        Materia materia = findEntityById(materiaId);
+    public MateriaDTO associarProfessor(String materiaIdentificador, String professorIdentificador) {
+
+        Materia materia = materiaRepository.find( "identificador" , materiaIdentificador).singleResult();
         
-        Professor professor = professorRepository.findByIdOptional(professorId)
-            .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com id: " + professorId));
-        
-        materia.setProfessor(professor);
-        
+        Professor professor = professorRepository.find( "identificador" , professorIdentificador).firstResult();
+        if(professor == null) {
+            throw new ResourceNotFoundException( "Professor não encontrado com id: " + professorIdentificador );
+        }
+
+        boolean jaAssociado = professorMateriaRepository
+                .find("professor.identificador = ?1 and materia.identificador = ?2",
+                        professorIdentificador, materiaIdentificador)
+                .firstResultOptional()
+                .isPresent();
+
+        if (!jaAssociado) {
+            ProfessorMateria professorMateria = new ProfessorMateria();
+            professorMateria.setProfessor(professor);
+            professorMateria.setMateria(materia);
+            professorMateriaRepository.persist(professorMateria);
+        }
+
         return mapper.toDTO(materia);
     }
     
