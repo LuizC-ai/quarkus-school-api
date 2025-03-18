@@ -47,10 +47,10 @@ public class ProfessorService {
     @Transactional
     public ProfessorDTO update(String identificador, ProfessorDTO professorDTO) {
         Objects.requireNonNull(professorDTO, "Professor não pode ser nulo");
-        Objects.requireNonNull(identificador, "ID não pode ser nulo");
-        
-        Professor entity = professorRepository.findByIdentificador(identificador)
-                        .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador));
+        Objects.requireNonNull(identificador, "Identificador não pode ser nulo");
+
+        Professor entity = findEntityByIdentificador (identificador);
+
         mapper.updateEntityFromDTO(professorDTO, entity);
         
         return mapper.toDTO(entity);
@@ -58,10 +58,8 @@ public class ProfessorService {
     
     @Transactional
     public void delete(String identificador) {
-        if(!professorRepository.existsByIdentificador(identificador)) {
-            throw new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador);
-        }
-        professorRepository.deleteByIdentificador(identificador);
+        Professor professor = findEntityByIdentificador(identificador);
+        professorRepository.delete(professor);
     }
 
     public List<ProfessorDTO> findByNome(String nome) {
@@ -72,8 +70,8 @@ public class ProfessorService {
         return mapper.toDTOList(professorRepository.findByNome(nome));
     }
 
-    private Optional<Professor> findEntityByIdentificador( String identificador) {
-        return Optional.ofNullable( professorRepository.findByIdentificador( identificador )
-                .orElseThrow( ( ) -> new ResourceNotFoundException( "Professor não encontrado com id: " + identificador ) ) );
+    private Professor findEntityByIdentificador(String identificador) {
+        return professorRepository.findByIdentificador(identificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador));
     }
 }

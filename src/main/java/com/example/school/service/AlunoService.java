@@ -7,6 +7,7 @@ import com.example.school.model.AlunoMateria;
 import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
 import com.example.school.dto.ProfessorDTO;
+import com.example.school.model.Professor;
 import com.example.school.repository.AlunoRepository;
 import com.example.school.repository.MateriaRepository;
 import com.example.school.repository.AlunoMateriaRepository;
@@ -52,7 +53,8 @@ public class AlunoService {
     }
     
     public AlunoDTO findByIdentificador(String identificador) {
-        Aluno aluno = alunoRepository.find( "identificador", identificador ).firstResult( );
+        Aluno aluno = alunoRepository.findByIdentificador(identificador)
+            .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador));
         if ( aluno == null ) {
             throw new ResourceNotFoundException( "Aluno não encontrado com id: " + identificador );
         }
@@ -75,17 +77,17 @@ public class AlunoService {
 
     @Transactional
     public void delete(String identificador) {
-
-        if (!alunoRepository.existsByIdentificador(identificador)) {
-            throw new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador);
-        }
-
-        alunoRepository.deleteByIdentificador(identificador);
+        Aluno aluno = findByEntityByIdentificador( identificador );
+        alunoRepository.delete( aluno );
     }
 
+    private Aluno findByEntityByIdentificador (String identificador){
+        return alunoRepository.findByIdentificador(identificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador));
+    }
 
     public List<MateriaDTO> getMateriasByAlunoIdentificador(String identificador) {
-        Optional<Aluno> aluno = alunoRepository.find( "identificador", identificador ).singleResultOptional();
+        Optional<Aluno> aluno = alunoRepository.findByIdentificador(identificador);
         if (aluno.isEmpty()) {
             throw new NotFoundException("Aluno não encontrado com id: " + identificador);
         }
@@ -98,7 +100,8 @@ public class AlunoService {
     }
 
     public List<ProfessorDTO> getProfessoresByAlunoIdentificador(String identificador) {
-        Aluno aluno = alunoRepository.find( "identificador", identificador ).firstResult();
+        Aluno aluno = alunoRepository.findByIdentificador( identificador )
+            .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador));
         if (aluno == null) {
             throw new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador);
         }
@@ -117,7 +120,8 @@ public class AlunoService {
     public AlunoDTO matricularEmMateria(String alunoIdentificador, String materiaIdentificador){
         matriculaService.matricular( alunoIdentificador, materiaIdentificador );
 
-        Aluno aluno = alunoRepository.find( "identificador", alunoIdentificador ).firstResult();
+        Aluno aluno = alunoRepository.findByIdentificador( alunoIdentificador )
+            .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + alunoIdentificador));
         return alunoMapper.toDTO(aluno);
     }
 

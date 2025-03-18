@@ -62,16 +62,17 @@ public class MateriaService {
     }
 
     private Materia findEntityByIdentificador( String identificador ) {
-        Optional<Materia> materia = materiaRepository.find( "identificador" , identificador).singleResultOptional();
+        Optional<Materia> materia = materiaRepository.findByIdentificador( identificador );
         if ( materia.isEmpty( ) ) {
-            throw new ResourceNotFoundException("Materia não encontrada com id: " + identificador);
+            throw new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador);
         }
         return materia.get( );
     }
 
     @Transactional
     public void delete(String identificador) {
-        if(!materiaRepository.deleteByIdentificador(identificador)) {
+        Optional<Materia> materia = materiaRepository.findByIdentificador(identificador);
+        if( materia.isEmpty() ) {
             throw new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador);
         }
     }
@@ -102,6 +103,6 @@ public class MateriaService {
      */
     private Materia findEntityById(Long id) {
         return materiaRepository.findByIdOptional(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com id: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + id));
     }
 }

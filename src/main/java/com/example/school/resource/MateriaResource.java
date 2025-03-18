@@ -57,8 +57,7 @@ public class MateriaResource {
     }
     
     @PUT
-    @Path("/{identificador}/professor/{professorIdentificador}")
-    public Response associarProfessor(@PathParam("identificador") String identificador, @PathParam("professorIdentificador") String professorIdentificador) {
+    public Response associarProfessor(@QueryParam("identificador") String identificador, @QueryParam("professor-identificador") String professorIdentificador) {
         MateriaDTO materia = materiaService.associarProfessor(identificador, professorIdentificador);
         return Response.ok(materia).build();
     }
