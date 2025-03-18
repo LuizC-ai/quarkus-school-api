@@ -13,6 +13,7 @@ import jakarta.ws.rs.BadRequestException;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @ApplicationScoped
 public class ProfessorService {
@@ -44,36 +45,35 @@ public class ProfessorService {
     }
     
     @Transactional
-    public ProfessorDTO update(Long id, ProfessorDTO professorDTO) {
+    public ProfessorDTO update(String identificador, ProfessorDTO professorDTO) {
         Objects.requireNonNull(professorDTO, "Professor não pode ser nulo");
-        Objects.requireNonNull(id, "ID não pode ser nulo");
+        Objects.requireNonNull(identificador, "ID não pode ser nulo");
         
-        Professor entity = findEntityById(id);
+        Professor entity = professorRepository.findByIdentificador(identificador)
+                        .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador));
         mapper.updateEntityFromDTO(professorDTO, entity);
         
         return mapper.toDTO(entity);
     }
     
     @Transactional
-    public void delete(Long id) {
-        Professor professor = findEntityById(id);
-        professorRepository.delete(professor);
+    public void delete(String identificador) {
+        if(!professorRepository.existsByIdentificador(identificador)) {
+            throw new ResourceNotFoundException("Professor não encontrado com identificador: " + identificador);
+        }
+        professorRepository.deleteByIdentificador(identificador);
     }
-    
+
     public List<ProfessorDTO> findByNome(String nome) {
-        // Adicionada validação que estava no resource
         if (nome == null || nome.trim().isEmpty()) {
             throw new BadRequestException("Parâmetro 'nome' é obrigatório");
         }
         
-        return mapper.toDTOList(professorRepository.list("nome", nome));
+        return mapper.toDTOList(professorRepository.findByNome(nome));
     }
-    
-    /**
-     * Método auxiliar para recuperar entidade por ID ou lançar exceção
-     */
-    private Professor findEntityById(Long id) {
-        return professorRepository.findByIdOptional(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com id: " + id));
+
+    private Optional<Professor> findEntityByIdentificador( String identificador) {
+        return Optional.ofNullable( professorRepository.findByIdentificador( identificador )
+                .orElseThrow( ( ) -> new ResourceNotFoundException( "Professor não encontrado com id: " + identificador ) ) );
     }
 }

@@ -29,9 +29,9 @@ public class ProfessorResource {
     }
     
     @GET
-    @Path("/{id}")
-    public Response getProfessor(@PathParam("id") Long id) {
-        ProfessorDTO professor = professorService.findById(id);
+    @Path("/{identificador}")
+    public Response getProfessor(@PathParam("identificador") String identificador) {
+        ProfessorDTO professor = professorService.findByIdentificador(identificador);
         return Response.ok(professor).build();
     }
     
@@ -43,16 +43,16 @@ public class ProfessorResource {
     }
     
     @PUT
-    @Path("/{id}")
-    public Response updateProfessor(@PathParam("id") Long id, @Valid ProfessorDTO professorDTO) {
-        ProfessorDTO updated = professorService.update(id, professorDTO);
+    @Path("/{identificador}")
+    public Response updateProfessor(@PathParam("identificador") String identificador, @Valid ProfessorDTO professorDTO) {
+        ProfessorDTO updated = professorService.update(identificador, professorDTO);
         return Response.ok(updated).build();
     }
     
     @DELETE
-    @Path("/{id}")
-    public Response deleteProfessor(@PathParam("id") Long id) {
-        professorService.delete(id);
+    @Path("/{identificador}")
+    public Response deleteProfessor(@PathParam("identificador") String identificador) {
+        professorService.delete(identificador);
         return Response.noContent().build();
     }
     
