@@ -7,9 +7,11 @@ import java.util.Optional;
 import com.example.school.dto.MateriaDTO;
 import com.example.school.exception.ResourceNotFoundException;
 import com.example.school.mapper.MateriaMapper;
+import com.example.school.model.AlunoMateria;
 import com.example.school.model.Materia;
 import com.example.school.model.Professor;
 import com.example.school.model.ProfessorMateria;
+import com.example.school.repository.AlunoMateriaRepository;
 import com.example.school.repository.MateriaRepository;
 import com.example.school.repository.ProfessorMateriaRepository;
 import com.example.school.repository.ProfessorRepository;
@@ -32,6 +34,9 @@ public class MateriaService {
 
     @Inject
     ProfessorMateriaRepository professorMateriaRepository;
+
+    @Inject
+    AlunoMateriaRepository alunoMateriaRepository;
     
     public List<MateriaDTO> findAll() {
         List<Materia> materias = materiaRepository.listAll();
@@ -71,10 +76,19 @@ public class MateriaService {
 
     @Transactional
     public void delete(String identificador) {
-        Optional<Materia> materia = materiaRepository.findByIdentificador(identificador);
-        if( materia.isEmpty() ) {
-            throw new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador);
+        Materia materia = materiaRepository.findByIdentificador(identificador)
+            .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + identificador));
+        List<AlunoMateria> alunoMaterias = alunoMateriaRepository.findByMateriaIdentificador(identificador);
+        for (AlunoMateria relacao : alunoMaterias) {
+            alunoMateriaRepository.delete(relacao);
         }
+
+        List<ProfessorMateria> professorMaterias = professorMateriaRepository.findByMateriaIdentificador(identificador);
+        for (ProfessorMateria relacao : professorMaterias) {
+            professorMateriaRepository.delete(relacao);
+        }
+
+        materiaRepository.delete(materia);
     }
 
     @Transactional

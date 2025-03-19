@@ -55,9 +55,12 @@ public class MateriaResource {
         materiaService.delete(identificador);
         return Response.noContent().build();
     }
-    
+
     @PUT
-    public Response associarProfessor(@QueryParam("identificador") String identificador, @QueryParam("professor-identificador") String professorIdentificador) {
+    @Path("/{identificador}/associar-professor/{professor-identificador}")
+    public Response associarProfessor(
+            @PathParam("identificador") String identificador,
+            @PathParam("professor-identificador") String professorIdentificador) {
         MateriaDTO materia = materiaService.associarProfessor(identificador, professorIdentificador);
         return Response.ok(materia).build();
     }

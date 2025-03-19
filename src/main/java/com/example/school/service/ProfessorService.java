@@ -61,7 +61,6 @@ public class ProfessorService {
         return mapper.toDTO(entity);
     }
 
-    //nao vai funcionar/
     @Transactional
     public void delete(String identificador) {
         List<ProfessorMateria> relacoes = professorMateriaRepository.findByProfessorIdentificador(identificador);
