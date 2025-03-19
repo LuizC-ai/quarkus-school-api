@@ -98,9 +98,6 @@ public class MateriaService {
         return mapper.toDTO(materia);
     }
 
-    /**
-     * Método auxiliar para recuperar entidade por ID ou lançar exceção
-     */
     private Materia findEntityById(Long id) {
         return materiaRepository.findByIdOptional(id)
             .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + id));

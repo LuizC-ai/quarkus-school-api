@@ -12,6 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
@@ -26,15 +27,17 @@ public class MatriculaService {
     @Inject
     AlunoMateriaRepository alunoMateriaRepository;
 
+    @Inject
+    MatriculaService matriculaService;
+
 
     @Transactional
     public void desassociarAlunoMateria(String alunoIdentificador, String materiaIdentificador) {
         verificarAlunoExiste(alunoIdentificador);
         verificarMateriaExiste(materiaIdentificador);
-        Optional<AlunoMateria> matricula = alunoMateriaRepository.find(
-                "aluno.identificador = ?1 AND materia.identificador = ?2",
-                alunoIdentificador, materiaIdentificador).firstResultOptional();
-        if (matricula.isPresent()) {
+        Optional<AlunoMateria> matricula = alunoMateriaRepository.findByAlunoAndMateriaIdentificador(
+                alunoIdentificador, materiaIdentificador);
+        if ( matricula.isPresent() ) {
             alunoMateriaRepository.delete(matricula.get());
         }
     }
@@ -68,6 +71,22 @@ public class MatriculaService {
             alunoMateria.setMateria(materia);
             alunoMateriaRepository.persist(alunoMateria);
         }
+    }
+//
+    @Transactional
+    public void delete (String identificador){
+        List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoIdentificador( identificador);
+        for (AlunoMateria matricula : matriculas) {
+            matriculaService.desassociarAlunoMateria(identificador, matricula.getMateria().getIdentificador());
+        }
+
+        Aluno aluno = findByEntityByIdentificador(identificador);
+        alunoRepository.delete(aluno);
+    }
+
+    private Aluno findByEntityByIdentificador( String identificador ) {
+        return alunoRepository.findByIdentificador( identificador)
+                .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador));
     }
 
 

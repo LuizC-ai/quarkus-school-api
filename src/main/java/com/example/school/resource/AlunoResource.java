@@ -73,7 +73,8 @@ public class AlunoResource {
     }
     
     @PUT
-    public Response matricularEmMateria(@QueryParam("identificador") String identificador, @QueryParam("materia-identificador") String materiaIdentificador) {
+    @Path("/{identificador}/materias/{materia-identificador}")
+    public Response associarProfessor(@PathParam("identificador") String identificador, @PathParam("materia-identificador") String materiaIdentificador) {
         alunoService.matricularEmMateria(identificador, materiaIdentificador);
         return Response.noContent().build();
     }
