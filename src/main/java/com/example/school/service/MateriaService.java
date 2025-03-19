@@ -3,6 +3,7 @@ package com.example.school.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.school.dto.MateriaDTO;
 import com.example.school.exception.ResourceNotFoundException;
@@ -117,5 +118,23 @@ public class MateriaService {
     private Materia findEntityById(Long id) {
         return materiaRepository.findByIdOptional(id)
             .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + id));
+    }
+
+    List<MateriaDTO> getMateriasByProfessorIdentificador( String identificador ) {
+        verificarProfessorExiste( identificador );
+        List<ProfessorMateria> professorMaterias = professorMateriaRepository.findByProfessorIdentificador(identificador);
+        return professorMaterias.stream()
+                .map(pm ->mapper.toDTO(pm.getMateria()))
+                .collect(Collectors.toList());
+    }
+
+    private void verificarProfessorExiste( String identificador ) {
+        if ( !professorExiste( identificador ) ) {
+            throw new ResourceNotFoundException( "Professor não encontrado com identificador " + identificador );
+        }
+    }
+
+    private boolean professorExiste( String identificador ) {
+        return professorRepository.existsByIdentificador( identificador );
     }
 }

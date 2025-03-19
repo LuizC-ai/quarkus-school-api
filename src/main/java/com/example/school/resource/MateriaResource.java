@@ -1,6 +1,7 @@
 package com.example.school.resource;
 
 import com.example.school.dto.MateriaDTO;
+import com.example.school.dto.ProfessorDTO;
 import com.example.school.service.MateriaService;
 
 import jakarta.inject.Inject;
@@ -33,6 +34,13 @@ public class MateriaResource {
     public Response getById(@PathParam("identificador") String identificador) {
         MateriaDTO materia = materiaService.findByIdentificador(identificador);
         return Response.ok(materia).build();
+    }
+
+    @GET
+    @Path( "/{identificador}/materias" )
+    public Response getMateriasByProfessor(@PathParam("identificador") String identificador) {
+        List<MateriaDTO> materias = materiaService.getMateriasByProfessorIdentificador(identificador);
+        return Response.ok(materias).build();
     }
 
     @POST
