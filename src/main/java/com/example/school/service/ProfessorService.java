@@ -4,6 +4,8 @@ import com.example.school.dto.ProfessorDTO;
 import com.example.school.exception.ResourceNotFoundException;
 import com.example.school.mapper.ProfessorMapper;
 import com.example.school.model.Professor;
+import com.example.school.model.ProfessorMateria;
+import com.example.school.repository.ProfessorMateriaRepository;
 import com.example.school.repository.ProfessorRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,7 +25,10 @@ public class ProfessorService {
     
     @Inject
     ProfessorMapper mapper;
-    
+
+    @Inject
+    ProfessorMateriaRepository professorMateriaRepository;
+
     public List<ProfessorDTO> findAll() {
         return mapper.toDTOList(professorRepository.listAll());
     }
@@ -59,6 +64,10 @@ public class ProfessorService {
     //nao vai funcionar/
     @Transactional
     public void delete(String identificador) {
+        List<ProfessorMateria> relacoes = professorMateriaRepository.findByProfessorIdentificador(identificador);
+        for (ProfessorMateria relacao : relacoes) {
+            professorMateriaRepository.delete(relacao);
+        }
         Professor professor = findEntityByIdentificador(identificador);
         professorRepository.delete(professor);
     }

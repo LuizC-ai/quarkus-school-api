@@ -77,8 +77,7 @@ public class AlunoService {
 
     @Transactional
     public void delete(String identificador) {
-        Aluno aluno = findByEntityByIdentificador( identificador );
-        alunoRepository.delete( aluno );
+        matriculaService.delete( identificador );
     }
 
     private Aluno findByEntityByIdentificador (String identificador){
