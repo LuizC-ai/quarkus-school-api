@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MateriaDTO extends BaseDTO {
 
+
     private String nome;
     private Professor professor;
     

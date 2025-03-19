@@ -16,7 +16,6 @@ public class MateriaMapper {
         MateriaDTO dto = new MateriaDTO();
         dto.setIdentificador( entity.getIdentificador());
         dto.setNome(entity.getNome());
-        dto.setProfessor(entity.getProfessor());
         dto.setQuantidadeHoras(entity.getQuantidadeHoras());
         
         
@@ -29,14 +28,12 @@ public class MateriaMapper {
         Materia entity = new Materia();
 
         entity.setNome(dto.getNome());
-        entity.setProfessor(dto.getProfessor());
         entity.setQuantidadeHoras(dto.getQuantidadeHoras());
         return entity;
     }
     
     public void updateEntityFromDTO(MateriaDTO dto, Materia entity) {
         if (dto.getNome() != null) entity.setNome(dto.getNome());
-        if (dto.getProfessor() != null) entity.setProfessor(dto.getProfessor());
         if (dto.getQuantidadeHoras() != null) entity.setQuantidadeHoras(dto.getQuantidadeHoras());
     }
         

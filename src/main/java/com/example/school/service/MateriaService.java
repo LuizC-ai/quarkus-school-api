@@ -19,6 +19,7 @@ import com.example.school.repository.ProfessorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 
 @ApplicationScoped
 public class MateriaService {
@@ -92,23 +93,24 @@ public class MateriaService {
     }
 
     @Transactional
-    public MateriaDTO associarProfessor(String materiaIdentificador, String professorIdentificador) {
+    public MateriaDTO associarProfessor( @NotBlank String materiaIdentificador, @NotBlank String professorIdentificador) {
+
         Materia materia = materiaRepository.findByIdentificador(materiaIdentificador)
                 .orElseThrow(() -> new ResourceNotFoundException("Materia não encontrada com identificador: " + materiaIdentificador));
 
         Professor professor = professorRepository.findByIdentificador(professorIdentificador)
                 .orElseThrow(() -> new ResourceNotFoundException("Professor não encontrado com identificador: " + professorIdentificador));
 
-        boolean jaAssociado = professorMateriaRepository
+        boolean associacaoJaExiste = professorMateriaRepository
                 .existsByProfessorAndMateriaIdentificador(professorIdentificador, materiaIdentificador);
 
-        if (!jaAssociado) {
-            ProfessorMateria professorMateria = new ProfessorMateria();
-            professorMateria.setProfessor(professor);
-            professorMateria.setMateria(materia);
-            professorMateriaRepository.persist(professorMateria);
+        if (associacaoJaExiste) {
+            throw new IllegalArgumentException( "Professor já associado a esta matéria" );
         }
-
+        ProfessorMateria professorMateria = new ProfessorMateria();
+        professorMateria.setProfessor(professor);
+        professorMateria.setMateria(materia);
+        professorMateriaRepository.persist(professorMateria);
         return mapper.toDTO(materia);
     }
 

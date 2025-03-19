@@ -1,13 +1,10 @@
 package com.example.school.service;
 
 import com.example.school.exception.ResourceNotFoundException;
-import com.example.school.model.Aluno;
-import com.example.school.model.Materia;
-import com.example.school.model.AlunoMateria;
+import com.example.school.model.*;
 import com.example.school.dto.AlunoDTO;
 import com.example.school.dto.MateriaDTO;
 import com.example.school.dto.ProfessorDTO;
-import com.example.school.model.Professor;
 import com.example.school.repository.AlunoRepository;
 import com.example.school.repository.MateriaRepository;
 import com.example.school.repository.AlunoMateriaRepository;
@@ -15,13 +12,14 @@ import com.example.school.mapper.AlunoMapper;
 import com.example.school.mapper.MateriaMapper;
 import com.example.school.mapper.ProfessorMapper;
 
+import com.example.school.repository.ProfessorMateriaRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -47,6 +45,9 @@ public class AlunoService {
 
     @Inject
     MatriculaService matriculaService;
+
+    @Inject
+    ProfessorMateriaRepository professorMateriaRepository;
 
     public List<AlunoDTO> findAll() {
         return alunoMapper.toDTOList(alunoRepository.listAll());
@@ -86,10 +87,7 @@ public class AlunoService {
     }
 
     public List<MateriaDTO> getMateriasByAlunoIdentificador(String identificador) {
-        Optional<Aluno> aluno = alunoRepository.findByIdentificador(identificador);
-        if (aluno.isEmpty()) {
-            throw new NotFoundException("Aluno não encontrado com id: " + identificador);
-        }
+        verificarAlunoExiste( identificador );
 
         List<AlunoMateria> matriculas = alunoMateriaRepository.find("aluno.identificador", identificador).list();
 
@@ -98,21 +96,36 @@ public class AlunoService {
             .collect(Collectors.toList());
     }
 
+    private void verificarAlunoExiste( String identificador ) {
+        if ( !alunoExiste( identificador ) ) {
+            throw new ResourceNotFoundException( "Aluno não encontrado com identificador " + identificador );
+        }
+    }
+
+    private boolean alunoExiste( String identificador ) {
+        return alunoRepository.existsByIdentificador( identificador );
+    }
+
     public List<ProfessorDTO> getProfessoresByAlunoIdentificador(String identificador) {
         Aluno aluno = alunoRepository.findByIdentificador( identificador )
-            .orElseThrow(() -> new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador));
-        if (aluno == null) {
-            throw new ResourceNotFoundException("Aluno não encontrado com identificador: " + identificador);
+                .orElseThrow( ( ) -> new ResourceNotFoundException( "Aluno não encontrado com identificador: " + identificador ) );
+
+        List<AlunoMateria> matriculas = alunoMateriaRepository.findByAlunoIdentificador( identificador );
+        Set<Professor> professorSet = new HashSet<>();
+
+        for (AlunoMateria matricula : matriculas) {
+            String materiaId = matricula.getMateria().getIdentificador();
+            List<ProfessorMateria> professorMaterias = professorMateriaRepository
+                    .findByMateriaIdentificador( materiaId );
+
+            for (ProfessorMateria pm : professorMaterias ) {
+                professorSet.add(pm.getProfessor());
+            }
         }
 
-        List<AlunoMateria> matriculas = alunoMateriaRepository.find("aluno.identificador", identificador).list();
-
-        return matriculas.stream()
-            .map(am -> am.getMateria())
-            .filter(materia -> materia.getProfessor() != null)
-            .map(materia -> professorMapper.toDTO(materia.getProfessor()))
-            .distinct()
-            .collect(Collectors.toList());
+        return professorSet.stream()
+                .map(professor -> professorMapper.toDTO(professor))
+                .collect( Collectors.toList() );
     }
 
     @Transactional

@@ -22,17 +22,5 @@ public class Materia extends ModeloIdBase {
     private String nome;
     private Integer quantidadeHoras;
 
-    @ManyToOne
-    @JoinColumn(name = "professor_id")
-    private Professor professor;
-
-    public Professor getProfessor() {
-        return professor;
-    }
-
-    public void setProfessor(Professor professor) {
-        this.professor = professor;
-    }
-
 }
 

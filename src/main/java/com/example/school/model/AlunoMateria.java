@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import com.example.school.core.ModeloIdBase;
 @Entity
 @Data
-
 @NoArgsConstructor
 @AllArgsConstructor
 public class AlunoMateria extends ModeloIdBase {

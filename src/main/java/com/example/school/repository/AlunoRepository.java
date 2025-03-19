@@ -10,7 +10,7 @@ import java.util.Optional;
 public class AlunoRepository implements PanacheRepository<Aluno> {
 
     public Optional<Aluno> findByIdentificador( String identificador ) {
-        return find("identificador", identificador).firstResultOptional();
+        return find("identificador", identificador).singleResultOptional();
     }
 
     public boolean existsByIdentificador(String identificador) {
